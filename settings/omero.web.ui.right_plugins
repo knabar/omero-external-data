@@ -1,0 +1,5 @@
+[
+  ["Acquisition", "webclient/data/includes/right_plugin.acquisition.js.html", "metadata_tab"],
+  ["Preview", "webclient/data/includes/right_plugin.preview.js.html", "preview_tab"],
+  ["External Data", "omero_external_data/right_plugin.js.html", "omero_external_data_tab"]
+]

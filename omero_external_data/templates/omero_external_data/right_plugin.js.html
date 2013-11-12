@@ -1,0 +1,20 @@
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+    $("#omero_external_data_tab").omeroweb_right_plugin({
+        load_tab_content: function(selected, obj_dtype, obj_id) {
+            var well_index = selected[0]["index"] || 0;
+            var url = '{% url omero_external_data_index 'image' 99 %}'.replace('image', obj_dtype).replace('99', obj_id);
+            if (well_index > 0) {
+                url = url + '?index='+well_index;
+            }
+            $(this).load(url);
+        },
+        tab_enabled: function() { return true; }
+    });
+
+});
+
+</script>

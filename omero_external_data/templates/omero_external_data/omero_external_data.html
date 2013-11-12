@@ -1,0 +1,36 @@
+{% load i18n %}
+
+
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        $("#omero_external_data_tab_inner form").ajaxForm({
+            success: function(html) {
+                $("#omero_external_data_tab_inner").parent().html(html);
+                $("#metadata_general").empty(); // force refresh
+            },
+        });
+
+        $('#omero_external_data_tab_inner .can-collapse').click(function () {
+          $(this).toggleClass('closed').next().slideToggle();
+        });
+
+        $('#omero_external_data_tab_inner .can-collapse.defclose').each(function () {
+          $(this).removeClass('defclose').toggleClass('closed').next().hide();
+        });
+
+    });
+</script>
+
+
+<div class="right_tab_inner" id="omero_external_data_tab_inner">
+
+    <div>{{ error }}</div>
+
+    <form method="post" action="{% url omero_external_data_index obj_dtype, obj_id %}" style="float: right;">
+
+        <input type="submit" value="Add external data source" />
+
+    </form>
+
+</div>
