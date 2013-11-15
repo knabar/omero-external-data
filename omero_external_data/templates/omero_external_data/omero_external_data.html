@@ -20,12 +20,39 @@
         });
 
         $('.external-data').each(function() {
-            console.log('loading', $(this), $(this).attr('data-name'));
             $(this).load("{% url omero_external_data_load_datasource obj_dtype, obj_id %}?datasource=" + $(this).attr('data-name'));
         });
+
+        $("#omero_external_data_tab_inner").on("click", ".remove-datasource", function(event){
+            var url = $(this).attr('url');
+            OME.removeItem(event, ".datasource-wrapper", url);
+            return false;
+        });
+
     });
 </script>
 
+<style>
+    .remove-datasource {
+        float: right;
+        cursor: pointer;
+        display: none;
+        -webkit-border-radius: 2px;
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px;
+        border: solid 1px transparent;
+        padding: 2px;
+    }
+
+    .remove-datasource:hover {
+        border: solid 1px rgba(0,0,0,.2);
+    }
+
+    .datasource-wrapper:hover .remove-datasource {
+        display: block;
+    }
+</style>
 
 <div class="right_tab_inner" id="omero_external_data_tab_inner">
 
@@ -34,8 +61,15 @@
 
     {% for datasource in datasources %}
 
-        <h1 class="can-collapse">{{ datasource.type }}</h1>
-        <div class="external-data" data-name="{{ datasource.name }}"></div>
+        <div class="datasource-wrapper">
+            <h1 class="can-collapse">{{ datasource.type }}</h1>
+            <div>
+                <img class="remove-datasource" src="/static/webclient/image/icon_basic_delete.png"
+                     url="{% url omero_external_data_delete_datasource obj_dtype, obj_id %}?datasource={{ datasource.name|urlencode }}"
+                     title="Delete data source" id="{{ datasource.name|urlencode }}-data source" />
+                <div class="external-data" data-name="{{ datasource.name }}"></div>
+            </div>
+        </div>
 
     {% endfor %}
 

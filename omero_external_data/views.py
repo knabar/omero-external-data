@@ -55,7 +55,7 @@ def index(request, obj_dtype, obj_id, conn=None, **_kwargs):
                 },
             })
 
-            store_datasource(conn, obj_dtype, obj_id)
+            store_datasource(conn, obj_dtype, obj_id, datasource)
 
         #
         #if annotation and request.GET.has_key('delete'):
@@ -105,3 +105,9 @@ def index(request, obj_dtype, obj_id, conn=None, **_kwargs):
 def load_datasource(request, obj_dtype, obj_id, conn=None, **_kwargs):
 
     return "Test for %s %s %s" % (obj_dtype, obj_id, request.GET.get('datasource'))
+
+@login_required()
+@render_response()
+def delete_datasource(request, obj_dtype, obj_id, conn=None, **_kwargs):
+
+    return dict(bad='true', errs='Deleting not supported yet')
