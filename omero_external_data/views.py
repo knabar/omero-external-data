@@ -20,14 +20,10 @@ def fetch_annotations(conn, obj_dtype, obj_id):
         yield annotation.getAnnotation()
 
 
-TEMP = 1
-
 def fetch_datasources(conn, obj_dtype, obj_id):
     for annotation in fetch_annotations(conn, obj_dtype, obj_id):
         datasource = json.loads(annotation.getValue())
-        datasource["name"] = 'datasource%s' % TEMP
-        global TEMP
-        TEMP += 1
+        datasource["id"] = annotation.id
         yield datasource
 
 
@@ -35,6 +31,15 @@ def store_datasource(conn, obj_dtype, obj_id, datasource):
     obj = conn.getObject(str(obj_dtype), obj_id)
     TermAnnotationWrapper.createAndLink(
         obj, settings.ANNOTATION_NAMESPACE, val=datasource)
+
+
+def remove_datasource(conn, obj_dtype, obj_id, datasource_id):
+    handle = conn.deleteObjects('/Annotation', [datasource_id])
+    try:
+        conn._waitOnCmd(handle)
+        return True
+    finally:
+        handle.close()
 
 
 @login_required()
@@ -109,5 +114,10 @@ def load_datasource(request, obj_dtype, obj_id, conn=None, **_kwargs):
 @login_required()
 @render_response()
 def delete_datasource(request, obj_dtype, obj_id, conn=None, **_kwargs):
-
-    return dict(bad='true', errs='Deleting not supported yet')
+    try:
+        bad = not remove_datasource(conn,  obj_dtype, obj_id, int(request.GET.get('datasource')))
+        errs = 'Could not remove data source' if bad else None
+    except Exception, ex:
+        bad = True
+        errs = str(ex)
+    return dict(bad=bad, errs=errs)
