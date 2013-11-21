@@ -11,6 +11,14 @@
             },
         });
 
+        $("#datasource_type").on('change', function() {
+            console.log('x', $(this).val(), 'y');
+            var val = $(this).val();
+            if (val) {
+                $("#datasource_type_form").load("{% url omero_external_data_datasource_type_form %}?datasource_type=" + val);
+            }
+        });
+
         $('#omero_external_data_tab_inner .can-collapse').click(function () {
           $(this).toggleClass('closed').next().slideToggle();
         });
@@ -83,11 +91,14 @@
     <div>
         <form method="post" action="{% url omero_external_data_index obj_dtype, obj_id %}?add_datasource">
 
-            Type: <select name="datasource_type">
+            Type: <select name="datasource_type" id="datasource_type">
+                <option></option>
             {% for datasource_type in datasource_types %}
                 <option value="{{ datasource_type.name }}">{{ datasource_type.label }}</option>
             {% endfor %}
             </select>
+
+            <div id="datasource_type_form"></div>
 
             <input type="submit" value="Add external data source" />
 

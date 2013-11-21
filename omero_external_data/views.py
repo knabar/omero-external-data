@@ -1,12 +1,13 @@
 import json
 
 from django.http import Http404, HttpResponse
+from django import forms
 
 from omeroweb.webclient.decorators import login_required, render_response
 from omero.gateway import TermAnnotationWrapper
 
 import settings
-from mocked import get_datasource_types
+from mocked import get_datasource_types, get_datasource_type
 
 
 def fetch_annotations(conn, obj_dtype, obj_id):
@@ -62,33 +63,6 @@ def index(request, obj_dtype, obj_id, conn=None, **_kwargs):
 
             store_datasource(conn, obj_dtype, obj_id, datasource)
 
-        #
-        #if annotation and request.GET.has_key('delete'):
-        #    obj = conn.getObject(str(obj_dtype), obj_id)
-        #    obj.removeAnnotations(merckeln.settings.ANNOTATION_NAMESPACE)
-        #    annotation = None
-
-        #else:
-        #
-        #    try:
-        #        eln_id = str(request.POST.get('eln_id'))
-        #
-        #        if not is_valid_eln_id(eln_id):
-        #            raise ValueError
-        #
-        #        if annotation:
-        #            annotation.setValue(eln_id)
-        #            annotation.save()
-        #        else:
-        #            obj = conn.getObject(str(obj_dtype), obj_id)
-        #            TermAnnotationWrapper.createAndLink(
-        #                obj, merckeln.settings.ANNOTATION_NAMESPACE, val=eln_id)
-        #            annotation = fetch_annotation(conn, obj_dtype, obj_id)
-        #
-        #    except ValueError:
-        #        error = 'Invalid ELN identifier'
-
-
     datasources = fetch_datasources(conn, obj_dtype, obj_id)
 
     datasource_types = get_datasource_types(obj_dtype)
@@ -108,8 +82,8 @@ def index(request, obj_dtype, obj_id, conn=None, **_kwargs):
 @login_required()
 @render_response()
 def load_datasource(request, obj_dtype, obj_id, conn=None, **_kwargs):
-
     return "Test for %s %s %s" % (obj_dtype, obj_id, request.GET.get('datasource'))
+
 
 @login_required()
 @render_response()
@@ -121,3 +95,38 @@ def delete_datasource(request, obj_dtype, obj_id, conn=None, **_kwargs):
         bad = True
         errs = str(ex)
     return dict(bad=bad, errs=errs)
+
+
+@login_required()
+@render_response()
+def render_form(request, conn=None, **_kwargs):
+
+    datasource_type = get_datasource_type(request.GET.get('datasource_type'))
+
+    class Form(forms.Form):
+        pass
+
+    form = Form()
+
+    for field in datasource_type['fields']:
+        form.fields[field['name']] = forms.CharField(
+            label=field['label'],
+            initial=field['default'],
+            required=field['required'],
+            )
+
+    context = {
+        'form': form,
+        'template': 'omero_external_data/datasource_type_form.html'
+    }
+    return context
+
+
+
+                #{
+                #    'name': 'url',
+                #    'label': 'URL',
+                #    'field_type': 'text',
+                #    'default': None,
+                #    'required': True,
+                #},
