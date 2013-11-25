@@ -1,0 +1,16 @@
+{
+    "name": "youtube",
+    "label": "YouTube",
+    "driver": "omero.ds.drivers.YouTube",
+    "inputs": [
+        {
+            "name": "url",
+            "label": "URL",
+            "type": "string",
+            "default": null,
+            "required": true
+        }
+    ],
+    "connection_info": [
+    ]
+}

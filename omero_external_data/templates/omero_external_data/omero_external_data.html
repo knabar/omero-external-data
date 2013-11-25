@@ -9,13 +9,17 @@
                 $("#omero_external_data_tab_inner").parent().html(html);
                 $("#metadata_general").empty(); // force refresh
             },
+            error: function(data) {
+                var errors = JSON.parse(data.responseText);
+                // TODO parse errors - can insert errors into form
+                alert(errors);
+            }
         });
 
         $("#datasource_type").on('change', function() {
-            console.log('x', $(this).val(), 'y');
             var val = $(this).val();
             if (val) {
-                $("#datasource_type_form").load("{% url omero_external_data_datasource_type_form %}?datasource_type=" + val);
+                $("#datasource_type_form").load("{% url omero_external_data_datasource_type_form  obj_dtype, obj_id %}?datasource_type=" + val);
             }
         });
 
@@ -70,7 +74,7 @@
     {% for datasource in datasources %}
 
         <div class="datasource-wrapper">
-            <h1 class="can-collapse">{{ datasource.type }}</h1>
+            <h1 class="can-collapse">{{ datasource.label }}</h1>
             <div>
                 <img class="remove-datasource" src="/static/webclient/image/icon_basic_delete.png"
                      url="{% url omero_external_data_delete_datasource obj_dtype, obj_id %}?datasource={{ datasource.id }}"
@@ -94,7 +98,7 @@
             Type: <select name="datasource_type" id="datasource_type">
                 <option></option>
             {% for datasource_type in datasource_types %}
-                <option value="{{ datasource_type.name }}">{{ datasource_type.label }}</option>
+                <option value="{{ datasource_type.ds_name }}">{{ datasource_type.ds_label }}</option>
             {% endfor %}
             </select>
 
